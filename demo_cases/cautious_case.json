@@ -1,0 +1,23 @@
+{
+  "start_date": "2026-05-01",
+  "end_date": "2026-06-15",
+  "meeting_duration_minutes": 30,
+  "slot_step_minutes": 15,
+  "max_results": 5,
+  "participants": [
+    {
+      "name": "Sam",
+      "timezone": "America/New_York",
+      "availability": [
+        {"day": "Mon", "start": "09:00", "end": "17:00"}
+      ]
+    },
+    {
+      "name": "Taylor",
+      "timezone": "Europe/London",
+      "availability": [
+        {"day": "Mon", "start": "09:00", "end": "17:00"}
+      ]
+    }
+  ]
+}

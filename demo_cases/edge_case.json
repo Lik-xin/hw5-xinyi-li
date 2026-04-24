@@ -1,0 +1,33 @@
+{
+  "start_date": "2026-05-04",
+  "end_date": "2026-05-05",
+  "meeting_duration_minutes": 60,
+  "slot_step_minutes": 30,
+  "max_results": 3,
+  "participants": [
+    {
+      "name": "Nina",
+      "timezone": "America/Los_Angeles",
+      "availability": [
+        {"day": "Mon", "start": "08:00", "end": "09:00"},
+        {"day": "Tue", "start": "08:00", "end": "09:00"}
+      ]
+    },
+    {
+      "name": "Omar",
+      "timezone": "Europe/Berlin",
+      "availability": [
+        {"day": "Mon", "start": "18:00", "end": "19:00"},
+        {"day": "Tue", "start": "18:00", "end": "19:00"}
+      ]
+    },
+    {
+      "name": "Priya",
+      "timezone": "Asia/Kolkata",
+      "availability": [
+        {"day": "Mon", "start": "23:00", "end": "23:45"},
+        {"day": "Tue", "start": "23:00", "end": "23:45"}
+      ]
+    }
+  ]
+}

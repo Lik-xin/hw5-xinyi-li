@@ -1,0 +1,36 @@
+{
+  "start_date": "2026-05-04",
+  "end_date": "2026-05-06",
+  "meeting_duration_minutes": 45,
+  "slot_step_minutes": 15,
+  "max_results": 4,
+  "participants": [
+    {
+      "name": "Alice",
+      "timezone": "America/New_York",
+      "availability": [
+        {"day": "Mon", "start": "09:00", "end": "17:00"},
+        {"day": "Tue", "start": "09:00", "end": "17:00"},
+        {"day": "Wed", "start": "09:00", "end": "17:00"}
+      ]
+    },
+    {
+      "name": "Ben",
+      "timezone": "Europe/London",
+      "availability": [
+        {"day": "Mon", "start": "13:00", "end": "18:00"},
+        {"day": "Tue", "start": "13:00", "end": "18:00"},
+        {"day": "Wed", "start": "13:00", "end": "18:00"}
+      ]
+    },
+    {
+      "name": "Chika",
+      "timezone": "Asia/Tokyo",
+      "availability": [
+        {"day": "Tue", "start": "21:00", "end": "23:30"},
+        {"day": "Wed", "start": "21:00", "end": "23:30"},
+        {"day": "Thu", "start": "21:00", "end": "23:30"}
+      ]
+    }
+  ]
+}
