@@ -7,7 +7,7 @@
 
 Replace the placeholder below with your final walkthrough video link:
 
-`VIDEO_LINK_HERE`
+`https://youtu.be/9UdlcPIMZk8`
 
 ## What The Skill Does
 
