@@ -179,14 +179,32 @@ def local_window_to_utc(target_date: date, participant: Participant, window: Ava
     return start_dt.astimezone(timezone.utc), end_dt.astimezone(timezone.utc)
 
 
-def intersect_ranges(ranges: list[tuple[datetime, datetime]]) -> tuple[datetime, datetime] | None:
-    if not ranges:
-        return None
-    latest_start = max(start for start, _ in ranges)
-    earliest_end = min(end for _, end in ranges)
-    if latest_start >= earliest_end:
-        return None
-    return latest_start, earliest_end
+def intersect_two_range_lists(
+    left: list[tuple[datetime, datetime]],
+    right: list[tuple[datetime, datetime]],
+) -> list[tuple[datetime, datetime]]:
+    intersections: list[tuple[datetime, datetime]] = []
+    i = 0
+    j = 0
+
+    left_sorted = sorted(left)
+    right_sorted = sorted(right)
+
+    while i < len(left_sorted) and j < len(right_sorted):
+        left_start, left_end = left_sorted[i]
+        right_start, right_end = right_sorted[j]
+
+        start = max(left_start, right_start)
+        end = min(left_end, right_end)
+        if start < end:
+            intersections.append((start, end))
+
+        if left_end <= right_end:
+            i += 1
+        else:
+            j += 1
+
+    return intersections
 
 
 def expand_slots(
@@ -215,8 +233,9 @@ def find_meeting_slots(
     all_slots: list[dict[str, Any]] = []
 
     for target_date in daterange(start_date, end_date):
-        participant_ranges: list[tuple[datetime, datetime]] = []
+        overlapping_ranges: list[tuple[datetime, datetime]] | None = None
         skip_day = False
+
         for participant in participants:
             windows_for_day = [
                 window for window in participant.availability if window.day_index == target_date.weekday()
@@ -225,39 +244,43 @@ def find_meeting_slots(
                 skip_day = True
                 break
 
-            combined_ranges = [
+            participant_ranges = [
                 local_window_to_utc(target_date, participant, window) for window in windows_for_day
             ]
-            # Use the full union span of same-day availability windows for a simple narrow skill.
-            day_start = min(start for start, _ in combined_ranges)
-            day_end = max(end for _, end in combined_ranges)
-            participant_ranges.append((day_start, day_end))
+
+            if overlapping_ranges is None:
+                overlapping_ranges = sorted(participant_ranges)
+            else:
+                overlapping_ranges = intersect_two_range_lists(overlapping_ranges, participant_ranges)
+                if not overlapping_ranges:
+                    skip_day = True
+                    break
 
         if skip_day:
             continue
 
-        overlap = intersect_ranges(participant_ranges)
-        if overlap is None:
+        if not overlapping_ranges:
             continue
 
-        for start_utc, end_utc in expand_slots(overlap, duration_minutes, step_minutes):
-            slot = {
-                "date": target_date.isoformat(),
-                "utc_start": start_utc.isoformat(),
-                "utc_end": end_utc.isoformat(),
-                "participants": {},
-            }
-            for participant in participants:
-                local_start = start_utc.astimezone(participant.timezone_obj)
-                local_end = end_utc.astimezone(participant.timezone_obj)
-                slot["participants"][participant.name] = {
-                    "timezone": participant.timezone_name,
-                    "local_start": local_start.isoformat(),
-                    "local_end": local_end.isoformat(),
+        for overlap in overlapping_ranges:
+            for start_utc, end_utc in expand_slots(overlap, duration_minutes, step_minutes):
+                slot = {
+                    "date": target_date.isoformat(),
+                    "utc_start": start_utc.isoformat(),
+                    "utc_end": end_utc.isoformat(),
+                    "participants": {},
                 }
-            all_slots.append(slot)
-            if len(all_slots) >= max_results:
-                return {"slots": all_slots, "warnings": []}
+                for participant in participants:
+                    local_start = start_utc.astimezone(participant.timezone_obj)
+                    local_end = end_utc.astimezone(participant.timezone_obj)
+                    slot["participants"][participant.name] = {
+                        "timezone": participant.timezone_name,
+                        "local_start": local_start.isoformat(),
+                        "local_end": local_end.isoformat(),
+                    }
+                all_slots.append(slot)
+                if len(all_slots) >= max_results:
+                    return {"slots": all_slots, "warnings": []}
 
     return {"slots": all_slots, "warnings": []}
 
